@@ -1,10 +1,3 @@
-//
-//  PresentAnimationController.swift
-//  CustomTransition
-//
-//  Created by naru on 2016/08/26.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 
@@ -16,7 +9,7 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
     
     public var transitionDuration: TimeInterval = 0.5
     
-    public var usingSpringWithDamping: CGFloat = 0.7
+    public var usingSpringWithDamping: CGFloat = 2.3
     
     public var initialSpringVelocity: CGFloat = 0.0
     
@@ -33,34 +26,25 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         // Get ViewControllers and Container View
 
         guard let fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting , fromViewController is UIViewController else {
-            if self.transitionController.debuging {
-                debugPrint("View2ViewTransition << No valid presenting view controller (\(transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from))))")
-            }
             return
         }
         guard let toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented , toViewController is UIViewController else {
-            if self.transitionController.debuging {
-                debugPrint("View2ViewTransition << No valid presented view controller (\(transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to)))")
-            }
             return
-        }
-        
-        if self.transitionController.debuging {
-            debugPrint("View2ViewTransition << Will Present")
-            debugPrint(" Presenting view controller: \(fromViewController)")
-            debugPrint(" Presented view controller: \(toViewController)")
         }
         
         let containerView = transitionContext.containerView
 
+        //protocol presenting
         fromViewController.prepareInitialView(self.transitionController.userInfo, isPresenting: true)
         let initialView: UIView = fromViewController.initialView(self.transitionController.userInfo, isPresenting: true)
         let initialFrame: CGRect = fromViewController.initialFrame(self.transitionController.userInfo, isPresenting: true)
         
+        //protocol presented
         toViewController.prepareDestinationView(self.transitionController.userInfo, isPresenting: true)
         let destinationView: UIView = toViewController.destinationView(self.transitionController.userInfo, isPresenting: true)
         let destinationFrame: CGRect = toViewController.destinationFrame(self.transitionController.userInfo, isPresenting: true)
         
+        //s
         let initialTransitionView: UIImageView = UIImageView(image: initialView.snapshotImage())
         initialTransitionView.clipsToBounds = true
         initialTransitionView.contentMode = .scaleAspectFill

@@ -1,10 +1,3 @@
-//
-//  CollectionViewController.swift
-//  CustomTransition
-//
-//  Created by naru on 2016/07/27.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 
@@ -27,7 +20,6 @@ class PresentingViewController: UIViewController, UICollectionViewDelegate, UICo
     var selectedIndexPath: IndexPath = IndexPath(item: 0, section: 0)
     
     lazy var collectionView: UICollectionView = {
-        
         let lendth: CGFloat = (UIScreen.main.bounds.size.width - 4.0)/3.0
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: lendth, height: lendth)
@@ -60,33 +52,45 @@ class PresentingViewController: UIViewController, UICollectionViewDelegate, UICo
     
     // MARK: CollectionView Delegate
     
+    //Did Select
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         self.selectedIndexPath = indexPath
         
+        //Presented VC
         let presentedViewController: PresentedViewController = PresentedViewController()
         
+        //weak...?
         presentedViewController.transitionController = self.transitionController
-        transitionController.userInfo = ["destinationIndexPath": indexPath as NSIndexPath, "initialIndexPath": indexPath as NSIndexPath]
         
-        // This example will push view controller if presenting view controller has navigation controller.
-        // Otherwise, present another view controller
+        transitionController.userInfo =
+            ["destinationIndexPath": indexPath as NSIndexPath,
+             "initialIndexPath": indexPath as NSIndexPath]
+
+        
         if let navigationController = self.navigationController {
             
             // Set transitionController as a navigation controller delegate and push.
             navigationController.delegate = transitionController
-            transitionController.push(viewController: presentedViewController, on: self, attached: presentedViewController)
+            transitionController.push(viewController: presentedViewController,
+                                      on: self,
+                                      attached: presentedViewController)
         
         } else {
             
             // Set transitionController as a transition delegate and present.
             presentedViewController.transitioningDelegate = transitionController
-            transitionController.present(viewController: presentedViewController, on: self, attached: presentedViewController, completion: nil)
+            
+            transitionController.present(viewController: presentedViewController,
+                                         on: self,
+                                         attached: presentedViewController,
+                                         completion: nil)
         }
         
         collectionView.deselectItem(at: indexPath, animated: true)
     }
     
+    //how it dismiss.........
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
        
         if let _ = self.navigationController { return }
@@ -126,23 +130,28 @@ class PresentingViewController: UIViewController, UICollectionViewDelegate, UICo
 
 extension PresentingViewController: View2ViewTransitionPresenting {
     
-    func initialFrame(_ userInfo: [String: AnyObject]?, isPresenting: Bool) -> CGRect {
+    func initialFrame(_ userInfo: [String: AnyObject]?,
+                      isPresenting: Bool) -> CGRect {
         
-        guard let indexPath: IndexPath = userInfo?["initialIndexPath"] as? IndexPath, let attributes: UICollectionViewLayoutAttributes = self.collectionView.layoutAttributesForItem(at: indexPath) else {
+        guard let indexPath: IndexPath = userInfo?["initialIndexPath"] as? IndexPath,
+            let attributes: UICollectionViewLayoutAttributes = self.collectionView.layoutAttributesForItem(at: indexPath) else {
             return CGRect.zero
         }
         return self.collectionView.convert(attributes.frame, to: self.collectionView.superview)
     }
     
-    func initialView(_ userInfo: [String: AnyObject]?, isPresenting: Bool) -> UIView {
+    func initialView(_ userInfo: [String: AnyObject]?,
+                     isPresenting: Bool) -> UIView {
         
         let indexPath: IndexPath = userInfo!["initialIndexPath"] as! IndexPath
+        
         let cell: UICollectionViewCell = self.collectionView.cellForItem(at: indexPath)!
         
         return cell.contentView
     }
     
     func prepareInitialView(_ userInfo: [String : AnyObject]?, isPresenting: Bool) {
+        
         let indexPath: IndexPath = userInfo!["initialIndexPath"] as! IndexPath
         
         if !isPresenting && !self.collectionView.indexPathsForVisibleItems.contains(indexPath) {

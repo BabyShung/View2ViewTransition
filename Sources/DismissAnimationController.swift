@@ -1,10 +1,3 @@
-//
-//  DismissAnimationController.swift
-//  CustomTransition
-//
-//  Created by naru on 2016/08/26.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 
@@ -16,13 +9,13 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
     
     public var transitionDuration: TimeInterval = 0.5
     
-    public var usingSpringWithDamping: CGFloat = 0.7
+    public var usingSpringWithDamping: CGFloat = 3.3
     
     public var initialSpringVelocity: CGFloat = 0.0
     
     public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
     
-    public var usingSpringWithDampingCancelling: CGFloat = 1.0
+    public var usingSpringWithDampingCancelling: CGFloat = 0.3
     
     public var initialSpringVelocityCancelling: CGFloat = 0.0
     

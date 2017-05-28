@@ -1,10 +1,3 @@
-//
-//  DismissInteractiveTransition.swift
-//  CustomTransition
-//
-//  Created by naru on 2016/08/29.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 

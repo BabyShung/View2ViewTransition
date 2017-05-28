@@ -20,10 +20,10 @@ public class MenuViewController: UIViewController {
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        guard !self.isViewControllerInitialized else {
-            return
-        }
+        guard !self.isViewControllerInitialized else { return }
         self.isViewControllerInitialized = true
+        
+        //
         self.present(PresentingViewController(), animated: true, completion: nil)
     }
     

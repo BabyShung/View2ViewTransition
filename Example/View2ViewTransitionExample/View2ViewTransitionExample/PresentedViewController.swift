@@ -40,7 +40,7 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
     
     lazy var collectionView: UICollectionView = {
         
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        let layout = UICollectionViewFlowLayout()
         layout.itemSize = self.view.bounds.size
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
@@ -89,6 +89,7 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         let cell: PresentedCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "presented_cell", for: indexPath) as! PresentedCollectionViewCell
         cell.contentView.backgroundColor = UIColor.white
         
@@ -128,7 +129,7 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
 
         let panGestureRecognizer: UIPanGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
         let transate: CGPoint = panGestureRecognizer.translation(in: self.view)
-        return Double(abs(transate.y)/abs(transate.x)) > M_PI_4
+        return Double(abs(transate.y) / abs(transate.x)) > M_PI_4
     }
 }
 
