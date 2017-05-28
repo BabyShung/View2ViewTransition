@@ -1,41 +1,9 @@
-//
-//  PresentedViewController.swift
-//  CustomTransition
-//
-//  Created by naru on 2016/07/27.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 
-class PresentedViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIGestureRecognizerDelegate {
+class PresentedViewController: UIViewController {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.edgesForExtendedLayout = []
-        
-        self.navigationItem.titleView = self.titleLabel
-        self.navigationItem.leftBarButtonItem = self.backItem
-        self.view.backgroundColor = UIColor.white
-        
-        self.view.addSubview(self.collectionView)
-        self.view.addSubview(self.closeButton)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        if let gestureRecognizers = self.view.gestureRecognizers {
-            for gestureRecognizer in gestureRecognizers {
-                if let panGestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
-                    panGestureRecognizer.delegate = self
-                }
-            }
-        }
-    }
-    
-    // MARK: Elements
-    
+    //this actually lives in PresentingVC
     weak var transitionController: TransitionController!
     
     lazy var collectionView: UICollectionView = {
@@ -78,6 +46,55 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
         return item
     }()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.edgesForExtendedLayout = []
+        
+        self.navigationItem.titleView = self.titleLabel
+        self.navigationItem.leftBarButtonItem = self.backItem
+        self.view.backgroundColor = UIColor.white
+        
+        self.view.addSubview(self.collectionView)
+        self.view.addSubview(self.closeButton)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if let gestureRecognizers = self.view.gestureRecognizers {
+            for gestureRecognizer in gestureRecognizers {
+                if let panGestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
+                    panGestureRecognizer.delegate = self
+                }
+            }
+        }
+    }
+    
+    // MARK: Actions
+    
+    func onCloseButtonClicked(sender: AnyObject) {
+        
+        let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
+
+        self.transitionController.userInfo = ["destinationIndexPath": indexPath,
+                                              "initialIndexPath": indexPath]
+
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func onBackItemClicked(sender: AnyObject) {
+        
+        let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
+        self.transitionController.userInfo = ["destinationIndexPath": indexPath,
+                                              "initialIndexPath": indexPath]
+        
+        if let navigationController = self.navigationController {
+            navigationController.popViewController(animated: true)
+        }
+    }
+}
+
+extension PresentedViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     // MARK: CollectionView Data Source
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -98,27 +115,9 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
         
         return cell
     }
-    
-    // MARK: Actions
-    
-    func onCloseButtonClicked(sender: AnyObject) {
-        
-        let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
+}
 
-        self.transitionController.userInfo = ["destinationIndexPath": indexPath, "initialIndexPath": indexPath]
-
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    func onBackItemClicked(sender: AnyObject) {
-        
-        let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
-        self.transitionController.userInfo = ["destinationIndexPath": indexPath, "initialIndexPath": indexPath]
-        
-        if let navigationController = self.navigationController {
-            navigationController.popViewController(animated: true)
-        }
-    }
+extension PresentedViewController: UIGestureRecognizerDelegate {
     
     // MARK: Gesture Delegate
     
@@ -126,7 +125,7 @@ class PresentedViewController: UIViewController, UICollectionViewDelegate, UICol
         
         let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
         self.transitionController.userInfo = ["destinationIndexPath": indexPath, "initialIndexPath": indexPath]
-
+        
         let panGestureRecognizer: UIPanGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
         let transate: CGPoint = panGestureRecognizer.translation(in: self.view)
         return Double(abs(transate.y) / abs(transate.x)) > M_PI_4

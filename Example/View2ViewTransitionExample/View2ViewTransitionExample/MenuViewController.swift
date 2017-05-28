@@ -1,41 +1,15 @@
-//
-//  MenuViewController.swift
-//  View2ViewTransitionExample
-//
-//  Created by naru on 2016/09/06.
-//  Copyright © 2016年 naru. All rights reserved.
-//
 
 import UIKit
 
 public class MenuViewController: UIViewController {
-
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.backgroundColor = UIColor.white
-
-        self.view.addSubview(self.tableView)
-    }
-    
-    override public func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        guard !self.isViewControllerInitialized else { return }
-        self.isViewControllerInitialized = true
-        
-        //
-        self.present(PresentingViewController(), animated: true, completion: nil)
-    }
     
     // MARK: Constants
-    
     private struct Constants {
         static let Font: UIFont = UIFont.systemFont(ofSize: 15.0)
         static let ButtonSize: CGSize = CGSize(width: 200.0, height: 44.0)
     }
     
     // MARK: Elements
-    
     private var isViewControllerInitialized: Bool = false
     
     lazy var tableView: UITableView = {
@@ -47,6 +21,22 @@ public class MenuViewController: UIViewController {
         tableView.dataSource = self
         return tableView
     }()
+    
+    override public func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.view.backgroundColor = UIColor.white
+        self.view.addSubview(self.tableView)
+    }
+    
+    override public func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        guard !self.isViewControllerInitialized else { return }
+        self.isViewControllerInitialized = true
+        
+        self.present(PresentingViewController(), animated: true, completion: nil)
+    }
 }
 
 extension MenuViewController: UITableViewDataSource {

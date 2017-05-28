@@ -1,22 +1,11 @@
 
 import UIKit
 
-class PresentingViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.backgroundColor = UIColor.white
-        
-        self.navigationItem.titleView = self.titleLabel
-        self.navigationItem.leftBarButtonItem = self.closeItem
-        
-        self.view.addSubview(self.collectionView)
-    }
-    
-    // MARK: Elements
+class PresentingViewController: UIViewController {
     
     let transitionController: TransitionController = TransitionController()
     
+    /// ** Selected Index path **
     var selectedIndexPath: IndexPath = IndexPath(item: 0, section: 0)
     
     lazy var collectionView: UICollectionView = {
@@ -50,77 +39,16 @@ class PresentingViewController: UIViewController, UICollectionViewDelegate, UICo
         return item
     }()
     
-    // MARK: CollectionView Delegate
-    
-    //Did Select
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.backgroundColor = UIColor.white
         
-        self.selectedIndexPath = indexPath
+        self.navigationItem.titleView = self.titleLabel
+        self.navigationItem.leftBarButtonItem = self.closeItem
         
-        //Presented VC
-        let presentedViewController: PresentedViewController = PresentedViewController()
-        
-        //weak...?
-        presentedViewController.transitionController = self.transitionController
-        
-        transitionController.userInfo =
-            ["destinationIndexPath": indexPath as NSIndexPath,
-             "initialIndexPath": indexPath as NSIndexPath]
-
-        
-        if let navigationController = self.navigationController {
-            
-            // Set transitionController as a navigation controller delegate and push.
-            navigationController.delegate = transitionController
-            transitionController.push(viewController: presentedViewController,
-                                      on: self,
-                                      attached: presentedViewController)
-        
-        } else {
-            
-            // Set transitionController as a transition delegate and present.
-            presentedViewController.transitioningDelegate = transitionController
-            
-            transitionController.present(viewController: presentedViewController,
-                                         on: self,
-                                         attached: presentedViewController,
-                                         completion: nil)
-        }
-        
-        collectionView.deselectItem(at: indexPath, animated: true)
-    }
-    
-    //how it dismiss.........
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-       
-        if let _ = self.navigationController { return }
-        
-        if scrollView.contentOffset.y <= -100.0 {
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    // MARK: CollectionView Data Source
-
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        self.view.addSubview(self.collectionView)
     }
 
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let cell: PresentingCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "presenting_cell", for: indexPath) as! PresentingCollectionViewCell
-        cell.contentView.backgroundColor = UIColor.lightGray
-        
-        let number: Int = indexPath.item%4 + 1
-        cell.content.image = UIImage(named: "image\(number)")
-        
-        return cell
-    }
-    
     // MARK: Actions
     
     func onCloseButtonClicked(sender: AnyObject) {
@@ -137,6 +65,7 @@ extension PresentingViewController: View2ViewTransitionPresenting {
             let attributes: UICollectionViewLayoutAttributes = self.collectionView.layoutAttributesForItem(at: indexPath) else {
             return CGRect.zero
         }
+        //convert frame and pass it to superview of collectionView
         return self.collectionView.convert(attributes.frame, to: self.collectionView.superview)
     }
     
@@ -154,10 +83,86 @@ extension PresentingViewController: View2ViewTransitionPresenting {
         
         let indexPath: IndexPath = userInfo!["initialIndexPath"] as! IndexPath
         
+        //dismissing and if you don't have the indexPath in current collectionView
         if !isPresenting && !self.collectionView.indexPathsForVisibleItems.contains(indexPath) {
             self.collectionView.reloadData()
             self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
             self.collectionView.layoutIfNeeded()
+        }
+    }
+}
+
+extension PresentingViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    // MARK: CollectionView Data Source
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 50
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell: PresentingCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "presenting_cell", for: indexPath) as! PresentingCollectionViewCell
+        cell.contentView.backgroundColor = UIColor.lightGray
+        
+        let number: Int = indexPath.item%4 + 1
+        cell.content.image = UIImage(named: "image\(number)")
+        
+        return cell
+    }
+    
+    // MARK: CollectionView Delegate
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        self.selectedIndexPath = indexPath
+        
+        //Presented VC
+        let presentedViewController: PresentedViewController = PresentedViewController()
+        
+        presentedViewController.transitionController = self.transitionController
+        
+        //TODO take it out to enum
+        transitionController.userInfo =
+            ["destinationIndexPath": indexPath as NSIndexPath,
+             "initialIndexPath": indexPath as NSIndexPath]
+        
+        
+        if let navigationController = self.navigationController {
+            
+            // Set transitionController as a navigation controller delegate and push.
+            navigationController.delegate = transitionController
+            transitionController.push(viewController: presentedViewController,
+                                      on: self,
+                                      attached: presentedViewController)
+            
+        } else {
+            
+            // Set transitionController as a transition delegate and present.
+            presentedViewController.transitioningDelegate = transitionController
+            
+            transitionController.present(viewController: presentedViewController,
+                                         on: self,
+                                         attached: presentedViewController,
+                                         completion: nil)
+        }
+        
+        collectionView.deselectItem(at: indexPath, animated: true)
+    }
+}
+
+//MARK: ScrollView delegate
+extension PresentingViewController {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        //not available on NVC
+        if let _ = self.navigationController { return }
+        
+        if scrollView.contentOffset.y <= -100.0 {
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }
