@@ -4,20 +4,17 @@ import UIKit
 public final class PresentAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
 
     public weak var transitionController: TransitionController!
-    
-    public var transitionDuration: TimeInterval = 0.5
-    public var usingSpringWithDamping: CGFloat = 2.3
-    public var initialSpringVelocity: CGFloat = 0.0
-    public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    public var config: TransitionConfig = TransitionConfig()
     
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return transitionDuration
+        return config.transitionDuration
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
-        guard let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting , fromVC is UIViewController else { return }
-        guard let toVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented , toVC is UIViewController else { return }
+        guard let fromObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting else { return }
+        guard let toObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented,
+            let toVC = toObj as? UIViewController else { return }
         
         let containerView = transitionContext.containerView
 
@@ -25,30 +22,25 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         let isPresenting = true
         
         //protocol presenting
-        fromVC.prepareInitialView(userInfo, isPresenting: isPresenting)
-        let initialView = fromVC.initialView(userInfo, isPresenting: isPresenting)
-        let initialFrame = fromVC.initialFrame(userInfo, isPresenting: isPresenting)
+        fromObj.prepareInitialView(userInfo, isPresenting: isPresenting)
+        let initialView = fromObj.initialView(userInfo, isPresenting: isPresenting)
+        let initialFrame = fromObj.initialFrame(userInfo, isPresenting: isPresenting)
         
         //protocol presented
-        toVC.prepareDestinationView(userInfo, isPresenting: isPresenting)
-        let destinationView = toVC.destinationView(userInfo, isPresenting: isPresenting)
-        let destinationFrame = toVC.destinationFrame(userInfo, isPresenting: isPresenting)
+        toObj.prepareDestinationView(userInfo, isPresenting: isPresenting)
+        let destinationView = toObj.destinationView(userInfo, isPresenting: isPresenting)
+        let destinationFrame = toObj.destinationFrame(userInfo, isPresenting: isPresenting)
         
-        //s
-        let initialTransitionView = UIImageView(image: initialView.snapshotImage())
-        initialTransitionView.clipsToBounds = true
-        initialTransitionView.contentMode = .scaleAspectFill
-        
-        let destinationTransitionView = UIImageView(image: destinationView.snapshotImage())
-        destinationTransitionView.clipsToBounds = true
-        destinationTransitionView.contentMode = .scaleAspectFill
+        //snapshot views
+        let initialTransitionView = initialView.snapshotImageView()
+        let destinationTransitionView = destinationView.snapshotImageView()
         
         // Hide Transisioning Views
         initialView.isHidden = true
         destinationView.isHidden = true
         
         // Add ToViewController's View
-        let toViewControllerView: UIView = (toVC as! UIViewController).view
+        let toViewControllerView: UIView = toVC.view
         toViewControllerView.alpha = CGFloat.leastNormalMagnitude
         containerView.addSubview(toViewControllerView)
         
@@ -61,8 +53,13 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         destinationTransitionView.alpha = 0.0
         
         // Animation
-        let duration: TimeInterval = transitionDuration(using: transitionContext)
-        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: self.usingSpringWithDamping, initialSpringVelocity: self.initialSpringVelocity, options: self.animationOptions, animations: {
+        let duration = transitionDuration(using: transitionContext)
+        UIView.animate(withDuration: duration,
+                       delay: 0.0,
+                       usingSpringWithDamping: config.usingSpringWithDamping,
+                       initialSpringVelocity: config.initialSpringVelocity,
+                       options: config.animationOptions,
+                       animations: {
             
             initialTransitionView.frame = destinationFrame
             initialTransitionView.alpha = 0.0

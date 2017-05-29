@@ -6,6 +6,17 @@ public enum TransitionControllerType {
     case pushing
 }
 
+public struct TransitionConfig {
+    public var transitionDuration: TimeInterval = 0.4
+    public var usingSpringWithDamping: CGFloat = 3.3
+    public var initialSpringVelocity: CGFloat = 1.0
+    public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    
+    public var usingSpringWithDampingCancelling: CGFloat = 0.3
+    public var initialSpringVelocityCancelling: CGFloat = 0.0
+    public var animationOptionsCancelling: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+}
+
 public final class TransitionController: NSObject {
     
     public var userInfo: [String: AnyObject]? = nil
@@ -41,39 +52,39 @@ public final class TransitionController: NSObject {
 
 extension TransitionController {
     /// Present
-    public func present<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedViewController: T, from presentingViewController: U, completion: (() -> Void)?) where T: UIViewController, U: UIViewController {
+    public func present<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedVC: T, from presentingVC: U, completion: (() -> Void)?) where T: UIViewController, U: UIViewController {
         
         //setup
         let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition,
                                          action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-        presentedViewController.view.addGestureRecognizer(pan)
-        self.presentingVC = presentingViewController
-        self.presentedVC = presentedViewController
+        presentedVC.view.addGestureRecognizer(pan)
+        self.presentingVC = presentingVC
+        self.presentedVC = presentedVC
         
         self.type = .presenting
         
         // Present
-        presentingViewController.present(presentedViewController, animated: true, completion: completion)
+        presentingVC.present(presentedVC, animated: true, completion: completion)
     }
     
     /// Push
-    public func push<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedViewController: T, from presentingViewController: U)
+    public func push<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedVC: T, from presentingVC: U)
         where T: UIViewController, U: UIViewController {
             
-            guard let navigationController = presentingViewController.navigationController else {
+            guard let navigationController = presentingVC.navigationController else {
                 fatalError("No navigation controller")
             }
             
             //setup
             let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-            presentedViewController.view.addGestureRecognizer(pan)
-            self.presentingVC = presentingViewController
-            self.presentedVC = presentedViewController
+            presentedVC.view.addGestureRecognizer(pan)
+            self.presentingVC = presentingVC
+            self.presentedVC = presentedVC
             
             self.type = .pushing
             
             // Push
-            navigationController.pushViewController(presentedViewController, animated: true)
+            navigationController.pushViewController(presentedVC, animated: true)
     }
 }
 

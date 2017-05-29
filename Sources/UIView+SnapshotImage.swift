@@ -12,4 +12,11 @@ public extension UIView {
         UIGraphicsEndImageContext()
         return snapshot
     }
+    
+    public func snapshotImageView() -> UIImageView {
+        let imageView = UIImageView(image: self.snapshotImage())
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }
 }

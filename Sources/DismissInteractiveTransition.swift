@@ -6,7 +6,6 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
     open var interactionInProgress: Bool = false
     
     open weak var transitionController: TransitionController!
-    
     open weak var animationController: DismissAnimationController!
     
     open var initialPanPoint = CGPoint.zero
@@ -36,10 +35,10 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
         }
         
         // Get Progress
-        let range: Float = Float(UIScreen.main.bounds.size.width)
+        let range = Float(UIScreen.main.bounds.size.width)
         let location: CGPoint = panGestureRecognizer.location(in: panGestureRecognizer.view)
         let distance: Float = sqrt(powf(Float(initialPanPoint.x - location.x), 2.0) + powf(Float(initialPanPoint.y - location.y), 2.0))
-        let progress: CGFloat = CGFloat(fminf(fmaxf((distance / range), 0.0), 1.0))
+        let progress = CGFloat(fminf(fmaxf((distance / range), 0.0), 1.0))
         
         // Get Transration
         let translation: CGPoint = panGestureRecognizer.translation(in: panGestureRecognizer.view)
@@ -76,8 +75,13 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
                 
                 cancel()
                 
-                let duration: Double = Double(self.duration)*Double(progress)
-                UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: UIViewAnimationOptions(), animations: {
+                let duration = Double(self.duration) * Double(progress)
+                UIView.animate(withDuration: duration,
+                               delay: 0.0,
+                               usingSpringWithDamping: 1.0,
+                               initialSpringVelocity: 0.0,
+                               options: UIViewAnimationOptions(),
+                               animations: {
                     
                     self.animationController.destinationTransitionView.frame = self.animationController.destinationFrame
                     self.animationController.initialTransitionView.frame = self.animationController.destinationFrame
@@ -100,8 +104,13 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
                 finish()
                 transitionController.presentingVC.view.isUserInteractionEnabled = false
                 
-                let duration = animationController.transitionDuration
-                UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: UIViewAnimationOptions(), animations: {
+                let duration = animationController.config.transitionDuration
+                UIView.animate(withDuration: duration,
+                               delay: 0.0,
+                               usingSpringWithDamping: 0.7,
+                               initialSpringVelocity: 0.0,
+                               options: UIViewAnimationOptions(),
+                               animations: {
                     
                     self.animationController.destinationTransitionView.alpha = 0.0
                     self.animationController.initialTransitionView.alpha = 1.0
@@ -125,7 +134,6 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
                     self.transitionContext.completeTransition(true)
                 })
             }
-            
         default:
             break
         }
