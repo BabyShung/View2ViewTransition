@@ -3,46 +3,42 @@ import UIKit
 
 open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
     
-    // MARK: Elements
-    
     open var interactionInProgress: Bool = false
     
     open weak var transitionController: TransitionController!
     
     open weak var animationController: DismissAnimationController!
     
-    open var initialPanPoint: CGPoint! = CGPoint.zero
+    open var initialPanPoint = CGPoint.zero
     
     fileprivate(set) var transitionContext: UIViewControllerContextTransitioning!
-    
-    // MARK: Gesture
     
     open override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         self.transitionContext = transitionContext
         super.startInteractiveTransition(transitionContext)
     }
     
+    // MARK: Pan Gesture
     open func handlePanGesture(_ panGestureRecognizer: UIPanGestureRecognizer) {
         
         if panGestureRecognizer.state == .began {
             
-            self.interactionInProgress = true
-            self.initialPanPoint = panGestureRecognizer.location(in: panGestureRecognizer.view)
+            interactionInProgress = true
+            initialPanPoint = panGestureRecognizer.location(in: panGestureRecognizer.view)
             
-            switch self.transitionController.type {
+            switch transitionController.type {
             case .presenting:
-                self.transitionController.presentedVC.dismiss(animated: true, completion: nil)
+                transitionController.presentedVC.dismiss(animated: true, completion: nil)
             case .pushing:
-                self.transitionController.presentedVC.navigationController!.popViewController(animated: true)
+                transitionController.presentedVC.navigationController!.popViewController(animated: true)
             }
-            
             return
         }
         
         // Get Progress
         let range: Float = Float(UIScreen.main.bounds.size.width)
         let location: CGPoint = panGestureRecognizer.location(in: panGestureRecognizer.view)
-        let distance: Float = sqrt(powf(Float(self.initialPanPoint.x - location.x), 2.0) + powf(Float(self.initialPanPoint.y - location.y), 2.0))
+        let distance: Float = sqrt(powf(Float(initialPanPoint.x - location.x), 2.0) + powf(Float(initialPanPoint.y - location.y), 2.0))
         let progress: CGFloat = CGFloat(fminf(fmaxf((distance / range), 0.0), 1.0))
         
         // Get Transration
@@ -54,8 +50,8 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
             
             update(progress)
             
-            self.animationController.destinationTransitionView.alpha = 1.0
-            self.animationController.initialTransitionView.alpha = 0.0
+            animationController.destinationTransitionView.alpha = 1.0
+            animationController.initialTransitionView.alpha = 0.0
             
             // Affine Transform
             let scale: CGFloat = (1000.0 - CGFloat(distance))/1000.0
@@ -63,17 +59,17 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
             transform = transform.scaledBy(x: scale, y: scale)
             transform = transform.translatedBy(x: translation.x/scale, y: translation.y/scale)
             
-            self.animationController.destinationTransitionView.transform = transform
-            self.animationController.initialTransitionView.transform = transform
+            animationController.destinationTransitionView.transform = transform
+            animationController.initialTransitionView.transform = transform
             
         case .cancelled:
             
-            self.interactionInProgress = false
-            self.transitionContext.cancelInteractiveTransition()
+            interactionInProgress = false
+            transitionContext.cancelInteractiveTransition()
             
         case .ended:
             
-            self.interactionInProgress = false
+            interactionInProgress = false
             panGestureRecognizer.setTranslation(CGPoint.zero, in: panGestureRecognizer.view)
             
             if progress < 0.5 {
@@ -102,9 +98,9 @@ open class DismissInteractiveTransition: UIPercentDrivenInteractiveTransition {
             } else {
                 
                 finish()
-                self.transitionController.presentingVC.view.isUserInteractionEnabled = false
+                transitionController.presentingVC.view.isUserInteractionEnabled = false
                 
-                let duration: Double = animationController.transitionDuration
+                let duration = animationController.transitionDuration
                 UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: UIViewAnimationOptions(), animations: {
                     
                     self.animationController.destinationTransitionView.alpha = 0.0

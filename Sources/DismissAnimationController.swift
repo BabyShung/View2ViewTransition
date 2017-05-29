@@ -3,34 +3,24 @@ import UIKit
 
 public final class DismissAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
     
-    // MARK: Elements
-
     public weak var transitionController: TransitionController!
     
     public var transitionDuration: TimeInterval = 0.5
-    
     public var usingSpringWithDamping: CGFloat = 3.3
-    
     public var initialSpringVelocity: CGFloat = 0.0
-    
     public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
     
     public var usingSpringWithDampingCancelling: CGFloat = 0.3
-    
     public var initialSpringVelocityCancelling: CGFloat = 0.0
-    
     public var animationOptionsCancelling: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
 
     fileprivate(set) var initialView: UIView!
-    
     fileprivate(set) var destinationView: UIView!
     
     fileprivate(set) var initialFrame: CGRect!
-    
     fileprivate(set) var destinationFrame: CGRect!
     
     fileprivate(set) var initialTransitionView: UIView!
-    
     fileprivate(set) var destinationTransitionView: UIView!
 
     // MARK: Transition
@@ -42,22 +32,22 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
         // Get ViewControllers and Container View
-        guard let fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresented , fromViewController is UIViewController else {
+        guard let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresented , fromVC is UIViewController else {
             fatalError("No valid presenting view controller")
         }
-        guard let toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresenting , toViewController is UIViewController else {
+        guard let toVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresenting , toVC is UIViewController else {
             fatalError("No valid presented view controller")
         }
         
         let containerView = transitionContext.containerView
         
-        fromViewController.prepareDestinationView(self.transitionController.userInfo, isPresenting: false)
-        self.destinationView = fromViewController.destinationView(self.transitionController.userInfo, isPresenting: false)
-        self.destinationFrame = fromViewController.destinationFrame(self.transitionController.userInfo, isPresenting: false)
+        fromVC.prepareDestinationView(self.transitionController.userInfo, isPresenting: false)
+        self.destinationView = fromVC.destinationView(self.transitionController.userInfo, isPresenting: false)
+        self.destinationFrame = fromVC.destinationFrame(self.transitionController.userInfo, isPresenting: false)
         
-        toViewController.prepareInitialView(self.transitionController.userInfo, isPresenting: false)
-        self.initialView = toViewController.initialView(self.transitionController.userInfo, isPresenting: false)
-        self.initialFrame = toViewController.initialFrame(self.transitionController.userInfo, isPresenting: false)
+        toVC.prepareInitialView(self.transitionController.userInfo, isPresenting: false)
+        self.initialView = toVC.initialView(self.transitionController.userInfo, isPresenting: false)
+        self.initialFrame = toVC.initialFrame(self.transitionController.userInfo, isPresenting: false)
         
         // Create Snapshot from Destination View
         self.destinationTransitionView = UIImageView(image: destinationView.snapshotImage())
@@ -73,8 +63,8 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
         destinationView.isHidden = true
         
         // Add To,FromViewController's View
-        let toViewControllerView: UIView = (toViewController as! UIViewController).view
-        let fromViewControllerView: UIView = (fromViewController as! UIViewController).view
+        let toViewControllerView: UIView = (toVC as! UIViewController).view
+        let fromViewControllerView: UIView = (fromVC as! UIViewController).view
         containerView.addSubview(fromViewControllerView)
         
         // This condition is to prevent getting white screen at dismissing when multiple view controller are presented.
