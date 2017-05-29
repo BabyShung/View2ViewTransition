@@ -2,54 +2,44 @@
 import UIKit
 
 public final class PresentAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
-    
-    // MARK: Elements
-    
+
     public weak var transitionController: TransitionController!
     
     public var transitionDuration: TimeInterval = 0.5
-    
     public var usingSpringWithDamping: CGFloat = 2.3
-    
     public var initialSpringVelocity: CGFloat = 0.0
-    
     public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
     
-    // MARK: Transition
-
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return self.transitionDuration
+        return transitionDuration
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
-        // Get ViewControllers and Container View
-
-        guard let fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting , fromViewController is UIViewController else {
-            return
-        }
-        guard let toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented , toViewController is UIViewController else {
-            return
-        }
+        guard let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting , fromVC is UIViewController else { return }
+        guard let toVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented , toVC is UIViewController else { return }
         
         let containerView = transitionContext.containerView
 
+        let userInfo = transitionController.userInfo
+        let isPresenting = true
+        
         //protocol presenting
-        fromViewController.prepareInitialView(self.transitionController.userInfo, isPresenting: true)
-        let initialView: UIView = fromViewController.initialView(self.transitionController.userInfo, isPresenting: true)
-        let initialFrame: CGRect = fromViewController.initialFrame(self.transitionController.userInfo, isPresenting: true)
+        fromVC.prepareInitialView(userInfo, isPresenting: isPresenting)
+        let initialView = fromVC.initialView(userInfo, isPresenting: isPresenting)
+        let initialFrame = fromVC.initialFrame(userInfo, isPresenting: isPresenting)
         
         //protocol presented
-        toViewController.prepareDestinationView(self.transitionController.userInfo, isPresenting: true)
-        let destinationView: UIView = toViewController.destinationView(self.transitionController.userInfo, isPresenting: true)
-        let destinationFrame: CGRect = toViewController.destinationFrame(self.transitionController.userInfo, isPresenting: true)
+        toVC.prepareDestinationView(userInfo, isPresenting: isPresenting)
+        let destinationView = toVC.destinationView(userInfo, isPresenting: isPresenting)
+        let destinationFrame = toVC.destinationFrame(userInfo, isPresenting: isPresenting)
         
         //s
-        let initialTransitionView: UIImageView = UIImageView(image: initialView.snapshotImage())
+        let initialTransitionView = UIImageView(image: initialView.snapshotImage())
         initialTransitionView.clipsToBounds = true
         initialTransitionView.contentMode = .scaleAspectFill
         
-        let destinationTransitionView: UIImageView = UIImageView(image: destinationView.snapshotImage())
+        let destinationTransitionView = UIImageView(image: destinationView.snapshotImage())
         destinationTransitionView.clipsToBounds = true
         destinationTransitionView.contentMode = .scaleAspectFill
         
@@ -58,7 +48,7 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         destinationView.isHidden = true
         
         // Add ToViewController's View
-        let toViewControllerView: UIView = (toViewController as! UIViewController).view
+        let toViewControllerView: UIView = (toVC as! UIViewController).view
         toViewControllerView.alpha = CGFloat.leastNormalMagnitude
         containerView.addSubview(toViewControllerView)
         

@@ -10,6 +10,9 @@ public final class TransitionController: NSObject {
     
     public var userInfo: [String: AnyObject]? = nil
     
+    fileprivate(set) var presentingVC: UIViewController!
+    fileprivate(set) var presentedVC: UIViewController!
+    
     fileprivate(set) var type: TransitionControllerType = .presenting
     
     //present controller
@@ -34,9 +37,6 @@ public final class TransitionController: NSObject {
         interactiveTransition.animationController = self.dismissAnimationController
         return interactiveTransition
     }()
-    
-    fileprivate(set) var presentingViewController: UIViewController!
-    fileprivate(set) var presentedViewController: UIViewController!
 }
 
 extension TransitionController {
@@ -47,8 +47,8 @@ extension TransitionController {
         let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition,
                                          action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
         presentedViewController.view.addGestureRecognizer(pan)
-        self.presentingViewController = presentingViewController
-        self.presentedViewController = presentedViewController
+        self.presentingVC = presentingViewController
+        self.presentedVC = presentedViewController
         
         self.type = .presenting
         
@@ -67,8 +67,8 @@ extension TransitionController {
             //setup
             let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
             presentedViewController.view.addGestureRecognizer(pan)
-            self.presentingViewController = presentingViewController
-            self.presentedViewController = presentedViewController
+            self.presentingVC = presentingViewController
+            self.presentedVC = presentedViewController
             
             self.type = .pushing
             

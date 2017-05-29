@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41D863071EDBBF6300DA9407 /* CrossDissolveAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D863061EDBBF6300DA9407 /* CrossDissolveAnimationController.swift */; };
 		4389BB771D73FA96000CD88C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4389BB761D73FA96000CD88C /* AppDelegate.swift */; };
 		4389BB7E1D73FA96000CD88C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4389BB7D1D73FA96000CD88C /* Assets.xcassets */; };
 		4389BB811D73FA96000CD88C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4389BB7F1D73FA96000CD88C /* LaunchScreen.storyboard */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		41D863061EDBBF6300DA9407 /* CrossDissolveAnimationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossDissolveAnimationController.swift; sourceTree = "<group>"; };
 		4389BB731D73FA96000CD88C /* View2ViewTransitionExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = View2ViewTransitionExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4389BB761D73FA96000CD88C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4389BB7D1D73FA96000CD88C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				4389BB8E1D73FB63000CD88C /* DismissAnimationController.swift */,
 				4389BB8F1D73FB63000CD88C /* DismissInteractiveTransition.swift */,
 				4389BBAE1D74311E000CD88C /* UIView+SnapshotImage.swift */,
+				41D863061EDBBF6300DA9407 /* CrossDissolveAnimationController.swift */,
 			);
 			name = Vender;
 			path = View2ViewTransitionExample;
@@ -172,6 +175,7 @@
 				4389BBAF1D74311E000CD88C /* UIView+SnapshotImage.swift in Sources */,
 				4389BB771D73FA96000CD88C /* AppDelegate.swift in Sources */,
 				4389BB8A1D73FB3F000CD88C /* PresentedViewController.swift in Sources */,
+				41D863071EDBBF6300DA9407 /* CrossDissolveAnimationController.swift in Sources */,
 				4389BB961D73FB63000CD88C /* TransitionController.swift in Sources */,
 				4389BB8B1D73FB3F000CD88C /* PresentingViewController.swift in Sources */,
 				4389BB921D73FB63000CD88C /* View2ViewTransition.swift in Sources */,
