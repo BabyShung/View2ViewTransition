@@ -21,38 +21,49 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         let userInfo = transitionController.userInfo
         let isPresenting = true
         
-        //protocol presenting
+        /*
+         Steps:
+         1.get views/frames from protocol
+         2.get initial/destination snapshot and hide both
+         3.add subview toVC.view (white bg)
+         4.set initial snapshot frame and add as subview(will fade out)
+         5.set destination snapshot frame and add as subview(will fade in)
+         6.animate
+         */
+        
+        //1.Protocol presenting
         fromObj.prepareInitialView(userInfo, isPresenting: isPresenting)
         let initialView = fromObj.initialView(userInfo, isPresenting: isPresenting)
         let initialFrame = fromObj.initialFrame(userInfo, isPresenting: isPresenting)
         
-        //protocol presented
+        //1.Protocol presented
         toObj.prepareDestinationView(userInfo, isPresenting: isPresenting)
         let destinationView = toObj.destinationView(userInfo, isPresenting: isPresenting)
         let destinationFrame = toObj.destinationFrame(userInfo, isPresenting: isPresenting)
         
-        //snapshot views
+        //2.Snapshot views
         let initialTransitionView = initialView.snapshotImageView()
         let destinationTransitionView = destinationView.snapshotImageView()
         
-        // Hide Transisioning Views
+        //2.Hide Transisioning Views
         initialView.isHidden = true
         destinationView.isHidden = true
         
-        // Add ToViewController's View
+        //3.Add toVC View (PresentedVC)
         let toViewControllerView: UIView = toVC.view
         toViewControllerView.alpha = CGFloat.leastNormalMagnitude
         containerView.addSubview(toViewControllerView)
         
-        // Add Snapshot
+        //4.Add initial Snapshot (presentingVC)
         initialTransitionView.frame = initialFrame
         containerView.addSubview(initialTransitionView)
         
+        //5.Add destination Snapshot (presentedVC)
         destinationTransitionView.frame = initialFrame
         containerView.addSubview(destinationTransitionView)
         destinationTransitionView.alpha = 0.0
         
-        // Animation
+        //6. Animation
         let duration = transitionDuration(using: transitionContext)
         UIView.animate(withDuration: duration,
                        delay: 0.0,
