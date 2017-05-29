@@ -43,22 +43,10 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
         
         // Get ViewControllers and Container View
         guard let fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresented , fromViewController is UIViewController else {
-            if self.transitionController.debuging {
-                debugPrint("View2ViewTransition << No valid presenting view controller (\(transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from)))")
-            }
-            return
+            fatalError("No valid presenting view controller")
         }
         guard let toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresenting , toViewController is UIViewController else {
-            if self.transitionController.debuging {
-                debugPrint("View2ViewTransition << No valid presenting view controller (\(transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to)))")
-            }
-            return
-        }
-        
-        if self.transitionController.debuging {
-            debugPrint("View2ViewTransition << Will Dismiss")
-            debugPrint(" Presented view controller: \(fromViewController)")
-            debugPrint(" Presenting view controller: \(toViewController)")
+            fatalError("No valid presented view controller")
         }
         
         let containerView = transitionContext.containerView

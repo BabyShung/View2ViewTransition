@@ -95,10 +95,9 @@ class PresentedViewController: UIViewController {
 }
 
 extension PresentedViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    // MARK: CollectionView Data Source
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        return 50 //data not the same
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -124,11 +123,12 @@ extension PresentedViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         
         let indexPath: NSIndexPath = self.collectionView.indexPathsForVisibleItems.first! as NSIndexPath
-        self.transitionController.userInfo = ["destinationIndexPath": indexPath, "initialIndexPath": indexPath]
+        self.transitionController.userInfo = ["destinationIndexPath": indexPath,
+                                              "initialIndexPath": indexPath]
         
         let panGestureRecognizer: UIPanGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
         let transate: CGPoint = panGestureRecognizer.translation(in: self.view)
-        return Double(abs(transate.y) / abs(transate.x)) > M_PI_4
+        return Double(abs(transate.y) / abs(transate.x)) > Double.pi //what??
     }
 }
 
@@ -136,15 +136,16 @@ extension PresentedViewController: View2ViewTransitionPresented {
     
     func destinationFrame(_ userInfo: [String: AnyObject]?, isPresenting: Bool) -> CGRect {
         
+        //WHY??
         let indexPath: IndexPath = userInfo!["destinationIndexPath"] as! IndexPath
-        let cell: PresentedCollectionViewCell = self.collectionView.cellForItem(at: indexPath) as! PresentedCollectionViewCell
+        let cell = self.collectionView.cellForItem(at: indexPath) as! PresentedCollectionViewCell
         return cell.content.frame
     }
 
     func destinationView(_ userInfo: [String: AnyObject]?, isPresenting: Bool) -> UIView {
         
         let indexPath: IndexPath = userInfo!["destinationIndexPath"] as! IndexPath
-        let cell: PresentedCollectionViewCell = self.collectionView.cellForItem(at: indexPath) as! PresentedCollectionViewCell
+        let cell = self.collectionView.cellForItem(at: indexPath) as! PresentedCollectionViewCell
         return cell.content
     }
     

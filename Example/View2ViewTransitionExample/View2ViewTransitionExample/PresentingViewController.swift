@@ -48,7 +48,7 @@ class PresentingViewController: UIViewController {
         
         self.view.addSubview(self.collectionView)
     }
-
+    
     // MARK: Actions
     
     func onCloseButtonClicked(sender: AnyObject) {
@@ -63,7 +63,7 @@ extension PresentingViewController: View2ViewTransitionPresenting {
         
         guard let indexPath: IndexPath = userInfo?["initialIndexPath"] as? IndexPath,
             let attributes: UICollectionViewLayoutAttributes = self.collectionView.layoutAttributesForItem(at: indexPath) else {
-            return CGRect.zero
+                return CGRect.zero
         }
         //convert frame and pass it to superview of collectionView
         return self.collectionView.convert(attributes.frame, to: self.collectionView.superview)
@@ -134,18 +134,16 @@ extension PresentingViewController: UICollectionViewDelegate, UICollectionViewDa
             
             // Set transitionController as a navigation controller delegate and push.
             navigationController.delegate = transitionController
-            transitionController.push(viewController: presentedViewController,
-                                      on: self,
-                                      attached: presentedViewController)
+            transitionController.push(vc: presentedViewController,
+                                      from: self)
             
         } else {
             
             // Set transitionController as a transition delegate and present.
             presentedViewController.transitioningDelegate = transitionController
             
-            transitionController.present(viewController: presentedViewController,
-                                         on: self,
-                                         attached: presentedViewController,
+            transitionController.present(vc: presentedViewController,
+                                         from: self,
                                          completion: nil)
         }
         

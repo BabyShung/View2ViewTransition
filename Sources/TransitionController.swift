@@ -8,49 +8,45 @@ public enum TransitionControllerType {
 
 public final class TransitionController: NSObject {
     
-    public var debuging: Bool = false
-    
     public var userInfo: [String: AnyObject]? = nil
     
-    private(set) var type: TransitionControllerType = .presenting
+    fileprivate(set) var type: TransitionControllerType = .presenting
     
     //present controller
     public lazy var presentAnimationController: PresentAnimationController = {
-        let controller: PresentAnimationController = PresentAnimationController()
+        let controller = PresentAnimationController()
         controller.transitionController = self //self is the delegate
         return controller
     }()
     
     //dismiss controller
     public lazy var dismissAnimationController: DismissAnimationController = {
-        let controller: DismissAnimationController = DismissAnimationController()
+        let controller = DismissAnimationController()
         controller.transitionController = self  //self is the delegate
         return controller
     }()
     
-    //dismiss interative !!!
+    //dismiss interative
     public lazy var dismissInteractiveTransition: DismissInteractiveTransition = {
-        let interactiveTransition: DismissInteractiveTransition = DismissInteractiveTransition()
+        let interactiveTransition = DismissInteractiveTransition()
         interactiveTransition.transitionController = self  //self is the delegate
         
         interactiveTransition.animationController = self.dismissAnimationController
-        
         return interactiveTransition
     }()
     
-    //
     fileprivate(set) var presentingViewController: UIViewController!
     fileprivate(set) var presentedViewController: UIViewController!
+}
 
-    /// Type Safe Present for Swift
-    public func present<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(viewController presentedViewController: T, //---
-        on presentingViewController: U, //---
-        attached: UIViewController, //---????
-        completion: (() -> Void)?) where T: UIViewController, U: UIViewController {
+extension TransitionController {
+    /// Present
+    public func present<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedViewController: T, from presentingViewController: U, completion: (() -> Void)?) where T: UIViewController, U: UIViewController {
         
-        let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-        attached.view.addGestureRecognizer(pan)
-        
+        //setup
+        let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition,
+                                         action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
+        presentedViewController.view.addGestureRecognizer(pan)
         self.presentingViewController = presentingViewController
         self.presentedViewController = presentedViewController
         
@@ -60,84 +56,35 @@ public final class TransitionController: NSObject {
         presentingViewController.present(presentedViewController, animated: true, completion: completion)
     }
     
-    @available(*, unavailable)
-    /// Present for Objective-C
-    public func present(viewController presentedViewController: UIViewController,
-                        on presentingViewController: UIViewController,
-                        attached: UIViewController,
-                        completion: (() -> Void)?) {
-    
-        let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-        attached.view.addGestureRecognizer(pan)
-        
-        self.presentingViewController = presentingViewController
-        self.presentedViewController = presentedViewController
-
-        self.type = .presenting
-        
-        // Present
-        presentingViewController.present(presentedViewController, animated: true, completion: completion)
-    }
-    
-    /// Type Safe Push for Swift
-    public func push<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(viewController presentedViewController: T,
-                     on presentingViewController: U,
-                     attached: UIViewController)
+    /// Push
+    public func push<T: View2ViewTransitionPresented, U: View2ViewTransitionPresenting>(vc presentedViewController: T, from presentingViewController: U)
         where T: UIViewController, U: UIViewController {
-        
-        guard let navigationController = presentingViewController.navigationController else {
-            if self.debuging {
-                debugPrint("View2ViewTransition << Cannot Find Navigation Controller for Presenting View Controller")
+            
+            guard let navigationController = presentingViewController.navigationController else {
+                fatalError("No navigation controller")
             }
-            return
-        }
-        
-        let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-        attached.view.addGestureRecognizer(pan)
-        
-        self.presentingViewController = presentingViewController
-        self.presentedViewController = presentedViewController
-        
-        self.type = .pushing
-        
-        // Push
-        navigationController.pushViewController(presentedViewController, animated: true)
-    }
-    
-    @available(*, unavailable)
-    /// Push for Objective-C
-    public func push(viewController presentedViewController: UIViewController,
-                     on presentingViewController: UIViewController,
-                     attached: UIViewController) {
-        
-        guard let navigationController = presentingViewController.navigationController else {
-            if self.debuging {
-                debugPrint("View2ViewTransition << Cannot Find Navigation Controller for Presenting View Controller")
-            }
-            return
-        }
-        
-        let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
-        attached.view.addGestureRecognizer(pan)
-        
-        self.presentingViewController = presentingViewController
-        self.presentedViewController = presentedViewController
-        
-        self.type = .pushing
-        
-        // Push
-        navigationController.pushViewController(presentedViewController, animated: true)
+            
+            //setup
+            let pan = UIPanGestureRecognizer(target: dismissInteractiveTransition, action: #selector(dismissInteractiveTransition.handlePanGesture(_:)))
+            presentedViewController.view.addGestureRecognizer(pan)
+            self.presentingViewController = presentingViewController
+            self.presentedViewController = presentedViewController
+            
+            self.type = .pushing
+            
+            // Push
+            navigationController.pushViewController(presentedViewController, animated: true)
     }
 }
 
 extension TransitionController: UIViewControllerTransitioningDelegate {
     
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.presentAnimationController
+        return presentAnimationController
     }
     
     public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.dismissAnimationController
+        return dismissAnimationController
     }
     
     public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
@@ -146,24 +93,25 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
 }
 
 extension TransitionController: UINavigationControllerDelegate {
-
+    
     public func navigationController(_ navigationController: UINavigationController,
                                      animationControllerFor operation: UINavigationControllerOperation,
                                      from fromVC: UIViewController,
                                      to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch operation {
         case .push:
-            return self.presentAnimationController
+            return presentAnimationController
         case .pop:
-            return self.dismissAnimationController
+            return dismissAnimationController
         default:
             return nil
         }
     }
     
     public func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        if animationController === self.dismissAnimationController && self.dismissInteractiveTransition.interactionInProgress {
-            return self.dismissInteractiveTransition
+        if animationController === dismissAnimationController &&
+            dismissInteractiveTransition.interactionInProgress {
+            return dismissInteractiveTransition
         }
         return nil
     }
