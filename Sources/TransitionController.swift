@@ -8,18 +8,26 @@ public enum TransitionControllerType {
 
 public struct TransitionConfig {
     public var transitionDuration: TimeInterval = 0.4
-    public var usingSpringWithDamping: CGFloat = 3.3
-    public var initialSpringVelocity: CGFloat = 1.0
-    public var animationOptions: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    public var finishLeastProgress: CGFloat = 0.15
     
-    public var usingSpringWithDampingCancelling: CGFloat = 0.3
-    public var initialSpringVelocityCancelling: CGFloat = 0.0
-    public var animationOptionsCancelling: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    public var finishDamping: CGFloat = 3.3
+    public var finishInitialVelocity: CGFloat = 1.0
+    public var finishAnimations: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    
+    public var finishInteractiveDamping: CGFloat = 1.5
+    public var finishInteractiveAnimations: UIViewAnimationOptions = [.curveEaseOut, .allowUserInteraction]
+    
+    public var cancelDamping: CGFloat = 3.3
+    public var cancelInitialVelocity: CGFloat = 0.0
+    public var cancelAnimations: UIViewAnimationOptions = [.curveEaseInOut, .allowUserInteraction]
+    
+    public var cancelInteractiveAnimations: UIViewAnimationOptions = [.curveEaseOut, .allowUserInteraction]
 }
 
 public final class TransitionController: NSObject {
     
     public var userInfo: [String: AnyObject]? = nil
+    public var config: TransitionConfig = TransitionConfig()
     
     fileprivate(set) var presentingVC: UIViewController!
     fileprivate(set) var presentedVC: UIViewController!
@@ -29,21 +37,21 @@ public final class TransitionController: NSObject {
     //present controller
     public lazy var presentAnimationController: PresentAnimationController = {
         let controller = PresentAnimationController()
-        controller.transitionController = self //self is the delegate
+        controller.transition = self //self is the delegate
         return controller
     }()
     
     //dismiss controller
     public lazy var dismissAnimationController: DismissAnimationController = {
         let controller = DismissAnimationController()
-        controller.transitionController = self  //self is the delegate
+        controller.transition = self  //self is the delegate
         return controller
     }()
     
     //dismiss interative
     public lazy var dismissInteractiveTransition: DismissInteractiveTransition = {
         let interactiveTransition = DismissInteractiveTransition()
-        interactiveTransition.transitionController = self  //self is the delegate
+        interactiveTransition.transition = self  //self is the delegate
         
         interactiveTransition.animationController = self.dismissAnimationController
         return interactiveTransition

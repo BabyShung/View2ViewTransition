@@ -3,11 +3,10 @@ import UIKit
 
 public final class PresentAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
 
-    public weak var transitionController: TransitionController!
-    public var config: TransitionConfig = TransitionConfig()
+    public weak var transition: TransitionController!
     
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return config.transitionDuration
+        return transition.config.transitionDuration
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -18,7 +17,7 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         
         let containerView = transitionContext.containerView
 
-        let userInfo = transitionController.userInfo
+        let userInfo = transition.userInfo
         let isPresenting = true
         
         /*
@@ -65,11 +64,12 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         
         //6. Animation
         let duration = transitionDuration(using: transitionContext)
+        let config = transition.config
         UIView.animate(withDuration: duration,
                        delay: 0.0,
-                       usingSpringWithDamping: config.usingSpringWithDamping,
-                       initialSpringVelocity: config.initialSpringVelocity,
-                       options: config.animationOptions,
+                       usingSpringWithDamping: config.finishDamping,
+                       initialSpringVelocity: config.finishInitialVelocity,
+                       options: config.finishAnimations,
                        animations: {
             
             initialTransitionView.frame = destinationFrame

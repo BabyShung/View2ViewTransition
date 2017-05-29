@@ -19,4 +19,13 @@ public extension UIView {
         imageView.contentMode = .scaleAspectFill
         return imageView
     }
+    
+    public func snapshotShadowImageView() -> ShadowImageView {
+        //TODO
+        let imageView = ShadowImageView()
+        imageView.image = self.snapshotImage()
+        imageView.imageCornerRaidus = 8
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }
 }

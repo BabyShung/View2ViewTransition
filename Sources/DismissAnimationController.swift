@@ -3,8 +3,7 @@ import UIKit
 
 public final class DismissAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
     
-    public weak var transitionController: TransitionController!
-    public var config: TransitionConfig = TransitionConfig()
+    public weak var transition: TransitionController!
     
     //Will be used in interactive controller
     fileprivate(set) var initialView: UIView!
@@ -17,7 +16,7 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
     // MARK: Transition
     
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return config.transitionDuration
+        return transition.config.transitionDuration
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -41,14 +40,14 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
          */
         
         //1.Protocol - destination (PresentedVC)
-        fromObj.prepareDestinationView(transitionController.userInfo, isPresenting: isPresenting)
-        destinationView = fromObj.destinationView(transitionController.userInfo, isPresenting: isPresenting)
-        destinationFrame = fromObj.destinationFrame(transitionController.userInfo, isPresenting: isPresenting)
+        fromObj.prepareDestinationView(transition.userInfo, isPresenting: isPresenting)
+        destinationView = fromObj.destinationView(transition.userInfo, isPresenting: isPresenting)
+        destinationFrame = fromObj.destinationFrame(transition.userInfo, isPresenting: isPresenting)
         
         //1.Protocol - initial (PresentingVC)
-        toObj.prepareInitialView(transitionController.userInfo, isPresenting: isPresenting)
-        initialView = toObj.initialView(transitionController.userInfo, isPresenting: isPresenting)
-        initialFrame = toObj.initialFrame(transitionController.userInfo, isPresenting: isPresenting)
+        toObj.prepareInitialView(transition.userInfo, isPresenting: isPresenting)
+        initialView = toObj.initialView(transition.userInfo, isPresenting: isPresenting)
+        initialFrame = toObj.initialFrame(transition.userInfo, isPresenting: isPresenting)
         
         //2.Create Snapshot from Destination View
         initialTransitionView = initialView.snapshotImageView()
@@ -81,24 +80,25 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
         
         //6.Animation
         let duration = transitionDuration(using: transitionContext)
-        
+        let config = transition.config
         if transitionContext.isInteractive {
+            print("ccccccc")
             UIView.animate(withDuration: duration,
                            delay: 0.0,
-                           usingSpringWithDamping: config.usingSpringWithDampingCancelling,
-                           initialSpringVelocity: config.initialSpringVelocityCancelling,
-                           options: config.animationOptionsCancelling,
+                           usingSpringWithDamping: config.cancelDamping,
+                           initialSpringVelocity: config.cancelInitialVelocity,
+                           options: config.cancelAnimations,
                            animations: {
-                            
-                fromViewControllerView.alpha = CGFloat.leastNormalMagnitude
+                                print("!@!@!@!@!@")
+//                fromViewControllerView.alpha = CGFloat.leastNormalMagnitude
                             
             }, completion: nil)
         } else {
             UIView.animate(withDuration: duration,
                            delay: 0.0,
-                           usingSpringWithDamping: config.usingSpringWithDamping,
-                           initialSpringVelocity: config.initialSpringVelocity,
-                           options: config.animationOptions,
+                           usingSpringWithDamping: config.finishDamping,
+                           initialSpringVelocity: config.finishInitialVelocity,
+                           options: config.finishAnimations,
                            animations: {
                 
                 self.destinationTransitionView.frame = self.initialFrame
@@ -112,7 +112,7 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
                 self.initialTransitionView.removeFromSuperview()
                 
                 if isNeedToControlToViewController &&
-                    self.transitionController.type == .presenting {
+                    self.transition.type == .presenting {
                     toViewControllerView.removeFromSuperview()
                 }
                 
