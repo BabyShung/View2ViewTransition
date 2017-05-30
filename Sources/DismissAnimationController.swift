@@ -1,18 +1,22 @@
 
 import UIKit
 
-public final class DismissAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
+public final class DismissAnimationController: NSObject {
     
     public weak var transition: TransitionController!
     
     //Will be used in interactive controller
     fileprivate(set) var initialView: UIView!
     fileprivate(set) var destinationView: UIView!
+    
     fileprivate(set) var initialFrame: CGRect!
     fileprivate(set) var destinationFrame: CGRect!
-    fileprivate(set) var initialTransitionView: UIView!
-    fileprivate(set) var destinationTransitionView: UIView!
+    
+    fileprivate(set) var initialSnapshotView: UIView!
+    fileprivate(set) var destinationSnapshotView: UIView!
+}
 
+extension DismissAnimationController: UIViewControllerAnimatedTransitioning {
     // MARK: Transition
     
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
@@ -21,9 +25,9 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
-        guard let fromObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresented,
+        guard let fromObj = transitionContext.fromVC as? View2ViewTransitionPresented,
             let fromVC = fromObj as? UIViewController else { return }
-        guard let toObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresenting,
+        guard let toObj = transitionContext.toVC as? View2ViewTransitionPresenting,
             let toVC = toObj as? UIViewController else { return }
         
         let containerView = transitionContext.containerView
@@ -35,8 +39,8 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
          2.get initial/destination snapshot and hide both
          3.add subview fromVC.view
          4.set destination snapshot frame and add as subview(will fade in)
-         5.set initial snapshot frame and add as subview(will fade out)
-         6.animate
+         4.set initial snapshot frame and add as subview(will fade out)
+         5.animate
          */
         
         //1.Protocol - destination (PresentedVC)
@@ -50,12 +54,11 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
         initialFrame = toObj.initialFrame(transition.userInfo, isPresenting: isPresenting)
         
         //2.Create Snapshot from Destination View
-        initialTransitionView = initialView.snapshotImageView()
-        destinationTransitionView = destinationView.snapshotImageView()
-                
+        initialSnapshotView = initialView.snapshotImageView()
+        destinationSnapshotView = destinationView.snapshotImageView()
+        
         //2.Hide Transisioning Views
-        initialView.isHidden = true
-        destinationView.isHidden = true
+        showTransitionViews(false)
         
         //3.Add fromVC View (PresentedVC)
         let fromViewControllerView: UIView = fromVC.view
@@ -69,58 +72,72 @@ public final class DismissAnimationController: NSObject, UIViewControllerAnimate
             containerView.sendSubview(toBack: toViewControllerView)
         }
         
-        //4.Add destination Snapshot (presentedVC)
-        destinationTransitionView.frame = destinationFrame
-        containerView.addSubview(destinationTransitionView)
+        //4.Add destination Snapshot (presentedVC) and initial Snapshot (presentingVC)
+        setSnapshotViewsFrame(destinationFrame)
         
-        //5.Add initial Snapshot (presentingVC)
-        initialTransitionView.frame = destinationFrame
-        containerView.addSubview(initialTransitionView)
-        initialTransitionView.alpha = 0.0
+        containerView.addSubview(destinationSnapshotView)
+        containerView.addSubview(initialSnapshotView)
         
-        //6.Animation
+        initialSnapshotView.alpha = 0.0
+        
+        //5.Animation
         let duration = transitionDuration(using: transitionContext)
         let config = transition.config
         if transitionContext.isInteractive {
-            print("ccccccc")
+            
             UIView.animate(withDuration: duration,
                            delay: 0.0,
                            usingSpringWithDamping: config.cancelDamping,
                            initialSpringVelocity: config.cancelInitialVelocity,
                            options: config.cancelAnimations,
                            animations: {
-                                print("!@!@!@!@!@")
-//                fromViewControllerView.alpha = CGFloat.leastNormalMagnitude
+                            
+                            fromViewControllerView.alpha = 0.2
                             
             }, completion: nil)
         } else {
             UIView.animate(withDuration: duration,
                            delay: 0.0,
                            usingSpringWithDamping: config.finishDamping,
-                           initialSpringVelocity: config.finishInitialVelocity,
+                           initialSpringVelocity: 0,
                            options: config.finishAnimations,
                            animations: {
-                
-                self.destinationTransitionView.frame = self.initialFrame
-                self.initialTransitionView.frame = self.initialFrame
-                self.initialTransitionView.alpha = 1.0
-                fromViewControllerView.alpha = CGFloat.leastNormalMagnitude
-                
+                            
+                            self.setSnapshotViewsFrame(self.initialFrame)
+                            
+                            self.initialSnapshotView.alpha = 1.0
+                            fromViewControllerView.alpha = CGFloat.leastNormalMagnitude
+                            
             }, completion: { _ in
-                    
-                self.destinationTransitionView.removeFromSuperview()
-                self.initialTransitionView.removeFromSuperview()
                 
+                self.removeSnapshotViews()
+
                 if isNeedToControlToViewController &&
                     self.transition.type == .presenting {
                     toViewControllerView.removeFromSuperview()
                 }
                 
-                self.initialView.isHidden = false
-                self.destinationView.isHidden = false
+                self.showTransitionViews(true)
                 
                 transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
             })
         }
+    }
+}
+
+extension DismissAnimationController {
+    public func removeSnapshotViews() {
+        initialSnapshotView?.removeFromSuperview()
+        destinationSnapshotView?.removeFromSuperview()
+    }
+    
+    public func showTransitionViews(_ show: Bool) {
+        initialView.isHidden = !show
+        destinationView.isHidden = !show
+    }
+    
+    public func setSnapshotViewsFrame(_ frame: CGRect) {
+        destinationSnapshotView.frame = frame
+        initialSnapshotView.frame = frame
     }
 }

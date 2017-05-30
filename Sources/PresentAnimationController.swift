@@ -11,8 +11,8 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
-        guard let fromObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as? View2ViewTransitionPresenting else { return }
-        guard let toObj = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as? View2ViewTransitionPresented,
+        guard let fromObj = transitionContext.fromVC as? View2ViewTransitionPresenting else { return }
+        guard let toObj = transitionContext.toVC as? View2ViewTransitionPresented,
             let toVC = toObj as? UIViewController else { return }
         
         let containerView = transitionContext.containerView
@@ -41,8 +41,8 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         let destinationFrame = toObj.destinationFrame(userInfo, isPresenting: isPresenting)
         
         //2.Snapshot views
-        let initialTransitionView = initialView.snapshotImageView()
-        let destinationTransitionView = destinationView.snapshotImageView()
+        let initialSnapshotView = initialView.snapshotImageView()
+        let destinationSnapshotView = destinationView.snapshotImageView()
         
         //2.Hide Transisioning Views
         initialView.isHidden = true
@@ -54,13 +54,13 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
         containerView.addSubview(toViewControllerView)
         
         //4.Add initial Snapshot (presentingVC)
-        initialTransitionView.frame = initialFrame
-        containerView.addSubview(initialTransitionView)
+        initialSnapshotView.frame = initialFrame
+        containerView.addSubview(initialSnapshotView)
         
         //5.Add destination Snapshot (presentedVC)
-        destinationTransitionView.frame = initialFrame
-        containerView.addSubview(destinationTransitionView)
-        destinationTransitionView.alpha = 0.0
+        destinationSnapshotView.frame = initialFrame
+        containerView.addSubview(destinationSnapshotView)
+        destinationSnapshotView.alpha = 0.0
         
         //6. Animation
         let duration = transitionDuration(using: transitionContext)
@@ -72,16 +72,16 @@ public final class PresentAnimationController: NSObject, UIViewControllerAnimate
                        options: config.finishAnimations,
                        animations: {
             
-            initialTransitionView.frame = destinationFrame
-            initialTransitionView.alpha = 0.0
-            destinationTransitionView.frame = destinationFrame
-            destinationTransitionView.alpha = 1.0
+            initialSnapshotView.frame = destinationFrame
+            initialSnapshotView.alpha = 0.0
+            destinationSnapshotView.frame = destinationFrame
+            destinationSnapshotView.alpha = 1.0
             toViewControllerView.alpha = 1.0
             
         }, completion: { _ in
                 
-            initialTransitionView.removeFromSuperview()
-            destinationTransitionView.removeFromSuperview()
+            initialSnapshotView.removeFromSuperview()
+            destinationSnapshotView.removeFromSuperview()
                 
             initialView.isHidden = false
             destinationView.isHidden = false

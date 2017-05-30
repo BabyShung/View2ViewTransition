@@ -21,7 +21,6 @@ public extension UIView {
     }
     
     public func snapshotShadowImageView() -> ShadowImageView {
-        //TODO
         let imageView = ShadowImageView()
         imageView.image = self.snapshotImage()
         imageView.imageCornerRaidus = 8

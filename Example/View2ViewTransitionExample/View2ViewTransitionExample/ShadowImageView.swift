@@ -8,7 +8,6 @@ public class ShadowImageView: UIView {
     private var imageView = UIImageView()
     private var blurredImageView = UIImageView()
 
-
     /// Gaussian Blur radius, larger will make the back ground shadow lighter (warning: do not set it too large, 2 or 3 for most cases)
     @IBInspectable
     public var blurRadius: CGFloat = 3 {
@@ -53,7 +52,6 @@ public class ShadowImageView: UIView {
             layoutShadow()
         }
     }
-
 
     /// Shadow offset value on y axis, postive -> right, negative -> left
     @IBInspectable
@@ -139,13 +137,13 @@ public class ShadowImageView: UIView {
     /// - Parameter from: input image
     /// - Returns: the real size of the image
     func getRealImageSize(_ from: UIImage) -> CGSize {
-        if contentMode == .scaleAspectFit {
+        
+        switch contentMode {
+        case .scaleAspectFit, .scaleAspectFill:
             let scale = min(bounds.size.width / from.size.width,
                             bounds.size.height / from.size.height)
-            print("xx")
             return from.size.scaled(by: scale)
-        } else {
-            print("yy")
+        default:
             return from.size
         }
     }

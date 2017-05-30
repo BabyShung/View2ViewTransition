@@ -107,7 +107,7 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
     }
     
     public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        return dismissInteractiveTransition.interactionInProgress ? dismissInteractiveTransition : nil
+        return dismissInteractiveTransition.inTransition ? dismissInteractiveTransition : nil
     }
 }
 
@@ -129,9 +129,21 @@ extension TransitionController: UINavigationControllerDelegate {
     
     public func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         if animationController === dismissAnimationController &&
-            dismissInteractiveTransition.interactionInProgress {
+            dismissInteractiveTransition.inTransition {
             return dismissInteractiveTransition
         }
         return nil
     }
 }
+
+// MARK: UIViewControllerContextTransitioning
+extension UIViewControllerContextTransitioning {
+    public var fromVC: UIViewController? {
+        return self.viewController(forKey: UITransitionContextViewControllerKey.from)
+    }
+    
+    public var toVC: UIViewController? {
+        return self.viewController(forKey: UITransitionContextViewControllerKey.to)
+    }
+}
+
